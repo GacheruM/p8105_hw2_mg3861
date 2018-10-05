@@ -143,3 +143,21 @@ combined_precipitation_data = bind_rows(precipitation_2016_data, precipitation_2
   mutate(month = month.name[month])
 ```
 
+Mr. Trash Wheel dataset contains `r nrow(trash_wheel_data) ` observations while the combined 2016 - 2017 precipitation dataset contains `r nrow(combined_precipitation_data) `
+observations. The Trash Wheel data contains the weight and volume of the trash as well as the amount of specific trash items (grocery bags, sports balls, cigarette butts, chip bags, plastic bottles, etc). In the combined precipitation dataset, the key variable is the total column which include the amount of precipitation for a particular month in the respective year. In 2017, the mean total precipitation in a particular month was `r round(mean(precipitation_2017_data$total), 3)` and the median total precipitaton in a particular month was `r median(precipitation_2017_data$total) `. In 2016, the mean total precipitation in a particular month was `r round(mean(precipitation_2016_data$total), 3)` and the median total precipitaton in a particular month was `r median(precipitation_2016_data$total) `. In 2016 and 2017, the highest total precipitation was `r min(combined_precipitation_data$total) ` while the lowest total precipitation was `r max(combined_precipitation_data$total) `
+
+For available data, what was the total precipitation in 2017?
+
+```{r}
+sum(precipitation_2017_data$total)
+```
+
+
+What was the median number of sports balls in a dumpster in 2016?
+
+```{r}
+filter(trash_wheel_data, year == 2016)%>%
+  pull(sports_balls)%>%
+  median()
+```
+
