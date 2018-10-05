@@ -5,5 +5,31 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_bw() + theme(legend.position = "bottom"))
+```
+
+#Problem 1
+
+Importing the data and cleaning by r
+1. Retaining line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance variables 
+
+2. Converting the entry variable from character to a logical variable
+
+```{r}
+station_data = read_csv("NYC_Transit_Data.csv")%>%
+  janitor::clean_names()%>%
+  select(line, station_name, station_latitude, station_longitude, 
+         starts_with("route"), entry, vending, entrance_type, ada)%>%
+  mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
 ```
 
