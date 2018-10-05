@@ -37,18 +37,17 @@ station_data = read_csv("NYC_Transit_Data.csv")%>%
 
 After importing, the dataset contains 32 variables, including station and entrance location (longitude and latitude), route names and numbers, staffing and staffing hours, entrance types, vending, ADA compliance, and so on. Since not all variables are needed for the analysis, a data cleaning occurs where only line, station, name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance variables were kept. Furthermore, the class of the entry variable is changed. As a result, the remaining NY station dataset contains `r nrow(station_data) ` rows and `r ncol(station_data)` columns. Unfortunately, these data are not tidy, specifically due to the route names and numbers. Each route number should not be a column while the route names should have their own column.  
 
-How many distinct stations are there, given that stations are identified both by name and by line?
+The are `r distinct(station_data, station_name, line) %>% nrow()`distinct statioins, given that stations are identified both by name and by line. 
 
 ```{r}
 distinct(station_data, station_name, line)%>%
   nrow()
 ```
 
-How many stations are ADA compliant?
+There are `r filter(station_data, ada == "TRUE") %>% count()` stations (not distinct) that are ADA compliant. 
 
 ```{r}
 filter(station_data, ada == "TRUE") %>%
-  distinct(station_name, line)%>%
   count()
 ```
 
@@ -79,12 +78,11 @@ filter(station_data, route_name == "A")%>%
 ```
 
 
-Of the stations that serve the A train, how many are ADA compliant?
+Of the stations (not distinct) that serve the A train, how many are ADA compliant?
 
 ```{r}
 filter(station_data, route_name == "A")%>%
   filter(ada == TRUE)%>%
-  distinct(station_name, line)%>%
   count()
 ```
 
@@ -183,5 +181,68 @@ brfss = brfss_smart2010%>%
   spread(key = response, value = data_value)%>%
   janitor::clean_names()%>%
   mutate(excellent_or_very_good = excellent + very_good)
+```
+
+There are `r distinct(brfss, locationabbr, locationdesc) %>% nrow() ` unique locations are included in the dataset. 
+
+```{r}
+distinct(brfss, locationabbr, locationdesc)%>%
+  nrow() 
+```
+
+Yes, every state is represented. There are `r distinct(brfss, locationabbr) %>% nrow()` states included (DC is considered as a state in the dataset).
+
+```{r}
+distinct(brfss, locationabbr)%>%
+  nrow()
+```
+
+New Jersey is the most observed state.
+
+```{r}
+group_by(brfss, locationabbr)%>%
+  count()%>%
+  arrange(n)%>%
+  pull(locationabbr)%>%
+  tail(1)
+```
+
+
+In 2002, what is the median of the “Excellent” response value?
+
+```{r}
+filter(brfss, year ==  2002)%>%
+  pull(excellent)%>%
+  median(na.rm = TRUE)
+```
+
+Making a histogram of “Excellent” response values in the year 2002
+
+```{r warning = FALSE, messages = FALSE}
+filter(brfss, year == 2002)%>%
+  ggplot(aes(x = excellent)) +
+  geom_histogram(fill = "deepskyblue")+
+  labs(
+    title = "Distribution of Excellent Response Values in 2002",
+    x = "Excellent Response Values (%)",
+    y = "Count"
+  )
+```
+
+
+Make a scatterplot showing the proportion of “Excellent” response values in New York County and Queens County (both in NY State) in each year from 2002 to 2010
+
+```{r}
+filter(brfss, year %in% 2002:2010, locationdesc %in% c("NY - New York County", "NY - Queens County"))%>%
+  ggplot(aes(x = year, y = excellent/100, color = locationdesc)) +
+  geom_point()+
+  labs(
+    title = "Proportion of Excellent Values in New York and Queens County",
+    x = "Year",
+    y = "Proportion of Excellent Response Values"
+  )+
+  scale_color_hue(name = "Location", 
+                  h = c(0, 200))
+
 ```
 
