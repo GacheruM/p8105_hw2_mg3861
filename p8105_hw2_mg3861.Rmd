@@ -20,16 +20,73 @@ theme_set(theme_bw() + theme(legend.position = "bottom"))
 
 #Problem 1
 
-Importing the data and cleaning by r
+Importing the data and cleaning by:
+
 1. Retaining line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance variables 
 
 2. Converting the entry variable from character to a logical variable
 
-```{r}
+```{r message = FALSE}
 station_data = read_csv("NYC_Transit_Data.csv")%>%
   janitor::clean_names()%>%
   select(line, station_name, station_latitude, station_longitude, 
          starts_with("route"), entry, vending, entrance_type, ada)%>%
   mutate(entry = recode(entry, "YES" = TRUE, "NO" = FALSE))
+
 ```
 
+After importing, the dataset contains 32 variables - station and entrance location (longitude and latitude), route names and numbers, staffing and staffing hours, entrance types, vending, ADA compliance, and so on. Since not all variables are needed for the analysis, a data cleaning occurs where only line, station, name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance variables were kept. Furthermore, the class of the entry variable is changed. As a result, the remaining NY station dataset contains `r nrow(station_data) ` rows and `r ncol(station_data)` columns. Unfortunately, these data are not tidy, specifically due to the route names and numbers. Each route number should not be a column while the route names should have their own column.  
+
+How many distinct stations are there, given that stations are identified both by name and by line?
+
+```{r}
+distinct(station_data, station_name, line)%>%
+  nrow()
+```
+
+How many stations are ADA compliant?
+
+```{r}
+filter(station_data, ada == "TRUE") %>%
+  distinct(station_name, line)%>%
+  count()
+```
+
+What proportion of station entrances / exits without vending allow entrance?
+
+```{r}
+filter(station_data, vending == "NO")%>%
+  pull(entry)%>%
+  mean()
+```
+
+
+Reformatting data so that route number and route name are distinct variables. 
+
+```{r messages= FALSE}
+station_data = gather(station_data, key = route_number, 
+                      value = route_name, route1:route11 )%>%
+  separate(route_number, into = c("Remove", "route_number"), sep = 5)%>%
+  select(everything(), -Remove)
+```
+
+How many distinct stations serve the A train? 
+
+```{r}
+filter(station_data, route_name == "A")%>%
+  distinct(station_name, line)%>%
+  nrow()
+```
+
+
+Of the stations that serve the A train, how many are ADA compliant?
+
+```{r}
+filter(station_data, route_name == "A")%>%
+  filter(ada == TRUE)%>%
+  distinct(station_name, line)%>%
+  count()
+```
+
+
+#Problem 2
