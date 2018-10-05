@@ -161,3 +161,27 @@ filter(trash_wheel_data, year == 2016)%>%
   median()
 ```
 
+#Problem 3
+
+Importing the BRFSS data and cleaning the data by:
+ 
+1. Filtering based on "Overall Health" in the topic variable
+
+2. Retaining class, topic, question, sample size, and all columns between lower confidence limit and GeoLocation
+
+3. Tidying the data (Responses as column names and proportion of the specific responses as the row entries)
+
+4. Creating a new variable that indicates the proportion of "Excellent" or "Very Good" responses
+
+```{r}
+library(p8105.datasets)
+
+brfss = brfss_smart2010%>%
+  janitor::clean_names()%>%
+  filter(topic == "Overall Health")%>%
+  select(everything(), -c(class, topic, question, sample_size, confidence_limit_low:geo_location))%>%
+  spread(key = response, value = data_value)%>%
+  janitor::clean_names()%>%
+  mutate(excellent_or_very_good = excellent + very_good)
+```
+
