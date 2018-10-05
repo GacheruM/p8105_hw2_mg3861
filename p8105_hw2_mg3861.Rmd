@@ -1,6 +1,7 @@
 ---
 title: "Homework 2 - Data Wrangling"
 author: "Margaret Gacheru"
+date: "October 5, 2018"
 output: github_document
 ---
 
@@ -41,7 +42,7 @@ station_data = read_csv("NYC_Transit_Data.csv")%>%
 
 After importing, the dataset contains 32 variables, including station and entrance location (longitude and latitude), route names and numbers, staffing and staffing hours, entrance types, vending, ADA compliance, and so on. Since not all variables are needed for the analysis, a data cleaning occurs where only line, station, name, station latitude/longitude, routes served, entry, vending, entrance type, and ADA compliance variables were kept. Furthermore, the class of the entry variable is changed. As a result, the remaining NY station dataset contains `r nrow(station_data) ` rows and `r ncol(station_data)` columns. Unfortunately, these data are not tidy, specifically due to the route names and numbers. Each route number should not be a column while the route names should have their own column.  
 
-The are `r distinct(station_data, station_name, line) %>% nrow()`distinct statioins, given that stations are identified both by name and by line. 
+The are `r distinct(station_data, station_name, line) %>% nrow()` distinct stations, given that stations are identified both by name and by line. 
 
 ```{r}
 
